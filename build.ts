@@ -3,15 +3,17 @@ import webpack = require("webpack");
 import * as os from "os";
 import * as fs from "fs";
 
+let serial = 0;
+
 export default function build(entry: string) {
   const outputPath = os.tmpdir();
-  const outputFilename = new Date() + ".js";
+  const outputFilename = Date.now().toString() + ++serial + ".js";
   const outputFilePath = path.join(outputPath, outputFilename);
   return new Promise<string>((resolve, reject) => {
     webpack(
       {
         mode: "production",
-        entry: path.join(__dirname, entry),
+        entry,
         resolve: {
           extensions: [".js", ".ts", ".json"]
         },
@@ -45,7 +47,9 @@ export default function build(entry: string) {
         } else {
           resolve(fs.readFileSync(outputFilePath, "utf-8"));
         }
-        fs.unlinkSync(outputFilePath);
+        if (fs.existsSync(outputFilePath)) {
+          fs.unlinkSync(outputFilePath);
+        }
       }
     );
   });
