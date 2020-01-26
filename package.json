@@ -1,0 +1,22 @@
+{
+  "name": "cdk-hello-world",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-cdk/aws-apigateway": "^1.22.0",
+    "@aws-cdk/aws-lambda": "^1.22.0",
+    "@aws-cdk/core": "^1.22.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.40",
+    "@types/node": "12",
+    "aws-cdk": "^1.22.0",
+    "typescript": "^3.7.5"
+  }
+}
