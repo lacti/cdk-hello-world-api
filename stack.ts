@@ -1,17 +1,22 @@
 import apigateway = require("@aws-cdk/aws-apigateway");
 import lambda = require("@aws-cdk/aws-lambda");
 import cdk = require("@aws-cdk/core");
-import * as fs from "fs";
-import * as path from "path";
+import build from "./build";
+
+async function buildSources() {
+  const hello = await build("src/hello.js");
+  return { hello };
+}
+
+type Unpromisify<T> = T extends Promise<infer U> ? U : T;
+type Sources = Unpromisify<ReturnType<typeof buildSources>>;
 
 export class ApiLambdaHelloWorldStack extends cdk.Stack {
-  constructor(app: cdk.App, id: string) {
+  constructor(app: cdk.App, id: string, sources: Sources) {
     super(app, id);
 
     const helloWorldLambda = new lambda.Function(this, "HelloWorldFunction", {
-      code: new lambda.InlineCode(
-        fs.readFileSync(path.join("src", "hello.js"), "utf-8")
-      ),
+      code: new lambda.InlineCode(sources.hello),
       handler: "index.handle",
       runtime: lambda.Runtime.NODEJS_12_X
     });
@@ -67,6 +72,9 @@ function addCorsOptions(apiResource: apigateway.IResource) {
   return apiResource;
 }
 
-const app = new cdk.App();
-new ApiLambdaHelloWorldStack(app, "ApiLambdaHelloWorld");
-app.synth();
+(async () => {
+  const sources = await buildSources();
+  const app = new cdk.App();
+  new ApiLambdaHelloWorldStack(app, "ApiLambdaHelloWorld", sources);
+  app.synth();
+})();
